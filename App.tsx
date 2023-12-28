@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { StatusBar, StyleSheet, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { DefaultTheme, NavigationContainer } from "@react-navigation/native";
 import MainTabNavigator from "./src/navigation/MainTabNavigator";
@@ -25,13 +25,16 @@ const App = () => {
   }
 
   return (
-    <NavigationContainer>
-      <SafeAreaProvider>
-        <View style={styles.container}>
-          <MainTabNavigator />
-        </View>
-      </SafeAreaProvider>
-    </NavigationContainer>
+    <>
+      <StatusBar barStyle={"light-content"} />
+      <NavigationContainer>
+        <SafeAreaProvider>
+          <View style={styles.container}>
+            <MainTabNavigator />
+          </View>
+        </SafeAreaProvider>
+      </NavigationContainer>
+    </>
   );
 };
 

@@ -1,5 +1,6 @@
 import {
   FlashcardType,
+  McqAnswersType,
   McqType,
   mapToSimplifiedFlashcard,
   mapToSimplifiedMcq,
@@ -53,6 +54,33 @@ export const fetchFlashCardData = async (times: number) => {
       );
 
       const dataResults = await Promise.all<FlashcardType>(dataPromises);
+
+      return dataResults;
+    }
+  } catch (err) {
+    console.log(err);
+  }
+  return [];
+};
+
+export const fetchMcqAnswers = async (ids: number[]) => {
+  try {
+    const fetchPromises = ids.map((id) => fetch(`${BASE_URL}/reveal?id=${id}`));
+
+    const results = await Promise.allSettled(fetchPromises);
+
+    const successfulResults = await results
+      .filter((result) => result.status === "fulfilled")
+      .map(
+        (result) => (result as { status: "fulfilled"; value: Response }).value
+      );
+
+    if (successfulResults.length > 0) {
+      const dataPromises = successfulResults.map(
+        async (response) => await response.json()
+      );
+
+      const dataResults = await Promise.all<McqAnswersType>(dataPromises);
 
       return dataResults;
     }

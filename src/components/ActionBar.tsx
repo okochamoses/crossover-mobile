@@ -1,64 +1,67 @@
-import React from "react";
+import React, { PropsWithChildren } from "react";
 import { View, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import _Text from "./_Text";
 
 type ActionBarProps = {
   avatar: string | undefined;
+  flip: Function | undefined;
 };
 
-const ActionBar: React.FC<ActionBarProps> = ({ avatar }) => (
+const ActionBar: React.FC<ActionBarProps> = ({ avatar, flip }) => (
   <View style={styles.container}>
-    <ActionIcon imageUrl={avatar} />
-    <ActionIcon name="heart" text={"87"} />
-    <ActionIcon name="chatbubble-ellipses-sharp" text={"2"} />
-    <ActionIcon name="bookmark" text={"203"} />
-    <ActionIcon name="md-arrow-redo-sharp" text={"17"} />
+    <ActionIcon name={{ uri: avatar }}>
+      <Image
+        source={{ uri: avatar }}
+        height={45}
+        width={45}
+        style={styles.image}
+      />
+      <Image
+        source={require("../../assets/add.png")}
+        height={10}
+        width={10}
+        style={{ height: 15, width: 15, marginTop: -8 }}
+      />
+    </ActionIcon>
+    <ActionIcon name={require("../../assets/Vector.png")} text={"87"} />
+    <ActionIcon name={require("../../assets/Subtract.png")} text={"2"} />
+    <ActionIcon name={require("../../assets/bookmark.png")} text={"203"} />
+    <ActionIcon name={require("../../assets/Union.png")} text={"17"} />
+    {flip == undefined ? (
+      <></>
+    ) : (
+      <ActionIcon onPress={flip} name="">
+        <Image source={require("../../assets/flip.png")} />
+      </ActionIcon>
+    )}
   </View>
 );
 
 type ActionIconProps = {
-  name?:
-    | "heart"
-    | "chatbubble-ellipses-sharp"
-    | "bookmark"
-    | "md-arrow-redo-sharp";
+  name: any;
   text?: string;
-  imageUrl?: string;
-};
+  imageUrl?: object | string;
+  onPress?: any | undefined;
+} & PropsWithChildren;
 
-const ActionIcon: React.FC<ActionIconProps> = ({ name, text, imageUrl }) => {
-  const renderData = (imageUrl: string) => {
-    if (imageUrl) {
-      return (
-        <Image
-          source={require("../../assets/add.png")}
-          height={10}
-          width={10}
-          style={{ height: 15, width: 15, marginTop: -8 }}
-        />
-      );
-    } else {
-      return <_Text>{text}</_Text>;
-    }
-  };
-
-  return (
-    <TouchableOpacity style={styles.actionIcon}>
-      {imageUrl ? (
-        <Image
-          source={{ uri: imageUrl }}
-          height={40}
-          width={40}
-          style={styles.image}
-        />
-      ) : (
-        <Ionicons name={name} size={35} color="#fff" />
-      )}
-      {renderData(imageUrl!!)}
-    </TouchableOpacity>
-  );
-};
+const ActionIcon: React.FC<ActionIconProps> = ({
+  name,
+  text,
+  onPress,
+  children,
+}) => (
+  <TouchableOpacity style={styles.actionIcon} onPress={onPress}>
+    {children ? (
+      children
+    ) : (
+      <View style={{ alignItems: "center" }}>
+        <Image source={name} style={{ marginBottom: 5 }} />
+        <_Text>{text}</_Text>
+      </View>
+    )}
+  </TouchableOpacity>
+);
 
 const styles = StyleSheet.create({
   container: {
@@ -73,7 +76,7 @@ const styles = StyleSheet.create({
   image: {
     borderWidth: 1,
     borderColor: "#fff",
-    borderRadius: 20,
+    borderRadius: 45 / 2,
   },
 });
 

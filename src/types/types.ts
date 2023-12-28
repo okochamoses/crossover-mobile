@@ -7,6 +7,16 @@ interface CommonProps {
   question?: string;
 }
 
+export type McqAnswersType = {
+  id: number;
+  correct_options: McqCorrectOption[];
+};
+
+export type McqCorrectOption = {
+  id: string;
+  answer: string;
+};
+
 export type FlashcardType = CommonProps & {
   answer?: string;
 };
@@ -17,6 +27,11 @@ export type McqType = CommonProps & {
     id: string;
     answer: string;
   }[];
+};
+
+export type CombinedMcqType = {
+  mcq: McqType;
+  ans: McqAnswersType;
 };
 
 export type FlashcardApiType = {

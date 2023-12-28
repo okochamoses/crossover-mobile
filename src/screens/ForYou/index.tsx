@@ -1,15 +1,15 @@
 import React, { PropsWithChildren, useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, ListRenderItem } from "react-native";
 import Mcq from "../../components/Mcq";
-import { McqType } from "../../types/types";
-import { fetchMcqData } from "../../api/apis";
+import { CombinedMcqType, McqAnswersType, McqType } from "../../types/types";
+import { fetchMcqAnswers, fetchMcqData } from "../../api/apis";
 import generateRandomString from "../../utils/RandomString";
 
 const ForYou: React.FC<PropsWithChildren> = () => {
   const INITIAL_MCQ_DATA_FETCH_LENGTH = 4;
   const MAX_MCQ_DATA_FETCH_LENGTH = 8;
 
-  const [data, setData] = useState<McqType[]>([]);
+  const [data, setData] = useState<{ mcq: McqType; ans: McqAnswersType }[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -19,10 +19,27 @@ const ForYou: React.FC<PropsWithChildren> = () => {
   const fetchDataAndSetState = async (amountOfData: number) => {
     setLoading(true);
     try {
-      const mcqData = await fetchMcqData(INITIAL_MCQ_DATA_FETCH_LENGTH);
+      const mcqData = await fetchMcqData(amountOfData);
+      const mcqAnswers = await fetchMcqAnswers(
+        mcqData
+          .map((data) => data.id)
+          .filter((id) => id !== undefined) as number[]
+      );
+      const combinedData: { mcq: McqType; ans: McqAnswersType }[] = mcqData
+        .map((mcq) => {
+          return {
+            mcq: mcq,
+            ans: mcqAnswers.find((it) => mcq.id === it.id),
+          };
+        })
+        .filter((d) => d.ans !== undefined) as {
+        mcq: McqType;
+        ans: McqAnswersType;
+      }[];
+
       setData((current) => [
         ...current,
-        ...mcqData.map((item, index) => ({
+        ...combinedData.map((item, index) => ({
           ...item,
           key: `${index}-${generateRandomString(8)}`,
         })),
@@ -34,7 +51,7 @@ const ForYou: React.FC<PropsWithChildren> = () => {
     }
   };
 
-  const renderItem: ListRenderItem<McqType> = ({ item, index }) => (
+  const renderItem: ListRenderItem<CombinedMcqType> = ({ item, index }) => (
     <Mcq {...item} index={index} key={index} />
   );
 
